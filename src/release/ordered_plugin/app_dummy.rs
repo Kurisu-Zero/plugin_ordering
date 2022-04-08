@@ -16,16 +16,23 @@ impl AppDummy<'_> {
         self.plugin_descriptor.ordered_plugin.build_impl(self);
     }
 
-    pub fn add_plugin<T>(&mut self, plugin: T) -> &mut Self
-    where
-        T: Plugin,
-    {
-        // plugin.build(self);
-        // self
+    pub fn add_plugin<T>(&mut self, mut plugin: PluginDescriptor) -> &mut Self {
+        //make sure the inner plugin also applies the modifications
+        plugin
+            .labels
+            .append(&mut self.plugin_descriptor.labels.clone());
+        plugin
+            .after
+            .append(&mut self.plugin_descriptor.after.clone());
+        plugin
+            .before
+            .append(&mut self.plugin_descriptor.before.clone());
+
+        plugin.build(self.app);
         self
     }
     pub fn add_system<Params>(&mut self, system: impl IntoSystemDescriptor<Params>) -> &mut Self {
-        //  self.add_system_to_stage(CoreStage::Update, system)
+        self.app.add_system(system);
         self
     }
 }
