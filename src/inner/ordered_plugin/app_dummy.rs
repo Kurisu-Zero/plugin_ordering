@@ -65,10 +65,17 @@ impl AppDummy<'_> {
             bevy::ecs::schedule::SystemDescriptor::Exclusive(e) => todo!(),
         };
 
-        println!("Adding system_descriptor");
+        println!(
+            "Adding system_descriptor: {}",
+            Self::name(&system_descriptor)
+        );
         self.app.add_system(system_descriptor);
         println!("Adding system_descriptor DONE");
         self
+    }
+
+    fn name<T>(v: &T) -> &'static str {
+        std::any::type_name::<T>()
     }
 
     #[cfg(not(feature = "mocked"))]
