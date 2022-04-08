@@ -14,4 +14,5 @@ mockall ={ version ="0.11.0", features =["nightly"]}
 
 
 [features]
+default = []
 mocked = []
