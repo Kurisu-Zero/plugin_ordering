@@ -4,8 +4,8 @@ pub mod mocked {
 
     mod app;
     mod plugin;
+    pub use self::app::__mock_MockApp::__add_system::Expectation as add_system_Expectation;
     pub use self::{app::MockApp as App, plugin::MockPlugin, plugin::Plugin};
-    pub use __mock_MockApp::__add_system::Expectation as add_system_Expectation;
 }
 
 #[cfg(not(feature = "mocked"))]
