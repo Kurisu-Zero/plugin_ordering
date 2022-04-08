@@ -65,7 +65,9 @@ impl AppDummy<'_> {
             bevy::ecs::schedule::SystemDescriptor::Exclusive(e) => todo!(),
         };
 
+        println!("Adding system_descriptor");
         self.app.add_system(system_descriptor);
+        println!("Adding system_descriptor DONE");
         self
     }
 
