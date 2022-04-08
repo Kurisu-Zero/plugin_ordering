@@ -24,39 +24,35 @@ impl AppDummy<'_> {
 
     pub fn add_plugin<T>(&mut self, mut plugin: PluginDescriptor) -> &mut Self {
         //make sure the inner plugin also applies the modifications
-        plugin
-            .labels
-            .append(&mut self.plugin_descriptor.labels.clone());
-        plugin
-            .after
-            .append(&mut self.plugin_descriptor.after.clone());
-        plugin
-            .before
-            .append(&mut self.plugin_descriptor.before.clone());
+
+        for label_function in &self.plugin_descriptor.labels {
+            plugin.labels.push(label_function.dyn_clone());
+        }
+        for label_function in &self.plugin_descriptor.before {
+            plugin.before.push(label_function.dyn_clone());
+        }
+        for label_function in &self.plugin_descriptor.after {
+            plugin.after.push(label_function.dyn_clone());
+        }
 
         plugin.build(self.app);
         self
-    }
-
-    fn f<T: SystemLabel + ?Sized>(
-        sys: ParallelSystemDescriptor,
-        label: Box<T>,
-    ) -> ParallelSystemDescriptor {
-        //   sys.label(*label)
-        todo!();
     }
 
     fn label_parallel_system(
         &mut self,
         mut system_descriptor: ParallelSystemDescriptor,
     ) -> SystemDescriptor {
-        let label = self.plugin_descriptor.labels[0].clone();
-        let r = Self::f(system_descriptor, label);
-        // for x in &self.plugin_descriptor.labels {
-        //     //
-        //     system_descriptor = system_descriptor.label(*x);
-        // }
-        SystemDescriptor::Parallel(r)
+        for label_function in &self.plugin_descriptor.labels {
+            system_descriptor = label_function.label()(system_descriptor);
+        }
+        for label_function in &self.plugin_descriptor.before {
+            system_descriptor = label_function.before()(system_descriptor);
+        }
+        for label_function in &self.plugin_descriptor.after {
+            system_descriptor = label_function.after()(system_descriptor);
+        }
+        SystemDescriptor::Parallel(system_descriptor)
     }
 
     fn add_system_impl<Params>(&mut self, system: impl IntoSystemDescriptor<Params>) -> &mut Self {
