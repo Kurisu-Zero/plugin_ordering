@@ -34,6 +34,7 @@ impl AppDummy<'_> {
 
     #[cfg(not(feature = "mocked"))]
     pub fn add_system<Params>(&mut self, system: impl IntoSystemDescriptor<Params>) -> &mut Self {
+        println!("run app_dummy::release_add_system");
         self.app.add_system(system);
         self
     }
@@ -43,6 +44,7 @@ impl AppDummy<'_> {
         &mut self,
         system: T,
     ) -> &mut Self {
+        println!("run app_dummy::mocked_add_system");
         self.app.add_system(system);
         self
     }
