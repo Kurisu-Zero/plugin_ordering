@@ -11,7 +11,7 @@ pub mod release {
     mod plugin_descriptor;
 
     pub use ordered_plugin::{app_dummy::AppDummy, OrderedPlugin, PlainDescriptor};
-    pub use plugin_descriptor::PluginDescriptor;
+    pub use plugin_descriptor::{PluginDescriptor, PluginDescriptorCoercion};
 
     #[cfg(feature = "mocked")]
     pub use crate::mocks::*;
