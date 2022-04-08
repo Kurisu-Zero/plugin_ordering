@@ -1,6 +1,6 @@
+use super::Plugin;
 use bevy::ecs::schedule::IntoSystemDescriptor;
-
-use super::*;
+use mockall::*;
 
 mock! {
     pub App {

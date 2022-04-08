@@ -1,16 +1,26 @@
-#![feature(fmt_internals)]
-#![feature(core_panic)]
-#![feature(libstd_sys_internals)]
-mod mocks;
-mod release;
-#[cfg(test)]
-mod release_copy;
+#[cfg(feature = "mocked")]
+pub mod mocks {
+    mod app;
+    mod plugin;
+    pub use self::{app::MockApp as App, plugin::MockPlugin, plugin::Plugin};
+}
 
-#[cfg(test)]
-mod tests {
+pub mod release {
 
-    mod tests_using_mocks;
-    mod tests_without_mocks;
+    mod ordered_plugin;
+    mod plugin_descriptor;
+
+    pub use ordered_plugin::{app_dummy::AppDummy, OrderedPlugin, PlainDescriptor};
+
+    use bevy::ecs::schedule::IntoSystemDescriptor;
+    pub use plugin_descriptor::{PluginDescriptor, PluginDescriptorCoercion};
+
+    #[cfg(feature = "mocked")]
+    pub use crate::mocks::*;
+    #[cfg(not(feature = "mocked"))]
+    pub use bevy::prelude::{App, Plugin};
+
+    pub use bevy::ecs::schedule::SystemDescriptor;
 }
 
 // unsafe impl Sync for TestPlugin {}
