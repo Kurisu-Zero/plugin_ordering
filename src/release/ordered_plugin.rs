@@ -31,6 +31,7 @@ impl<T: OrderedPlugin> PlainDescriptor for T {
 
 impl Plugin for PluginDescriptor {
     fn build(&self, app: &mut App) {
+        print!("Plugin is being build");
         let mut app_dummy = AppDummy::new(app, &self);
         app_dummy.build_impl();
     }
