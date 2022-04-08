@@ -31,7 +31,18 @@ impl AppDummy<'_> {
         plugin.build(self.app);
         self
     }
+
+    #[cfg(not(feature = "mocked"))]
     pub fn add_system<Params>(&mut self, system: impl IntoSystemDescriptor<Params>) -> &mut Self {
+        self.app.add_system(system);
+        self
+    }
+
+    #[cfg(feature = "mocked")]
+    pub fn add_system<T: 'static + IntoSystemDescriptor<Params>, Params: 'static>(
+        &mut self,
+        system: T,
+    ) -> &mut Self {
         self.app.add_system(system);
         self
     }
