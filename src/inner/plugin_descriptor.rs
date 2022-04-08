@@ -1,9 +1,13 @@
 use bevy::prelude::SystemLabel;
 
-use super::*;
+use super::{
+    ordered_plugin::sized_label::{FunctionBuilder, LabelFunction},
+    *,
+};
 
 type BoxedSystemLabel = Box<dyn SystemLabel>;
 type BoxedOrderedPlugin = Box<dyn OrderedPlugin>;
+type BoxedLabelFunction = Box<dyn LabelFunction>;
 
 // pub enum PluginDescriptor {
 //     Parallel(PluginDescriptor),
@@ -47,9 +51,9 @@ impl IntoPluginDescriptor<()> for BoxedOrderedPlugin {
 
 pub struct PluginDescriptor {
     pub(crate) ordered_plugin: BoxedOrderedPlugin,
-    pub(crate) labels: Vec<BoxedSystemLabel>,
-    pub(crate) before: Vec<BoxedSystemLabel>,
-    pub(crate) after: Vec<BoxedSystemLabel>,
+    pub(crate) labels: Vec<BoxedLabelFunction>,
+    pub(crate) before: Vec<BoxedLabelFunction>,
+    pub(crate) after: Vec<BoxedLabelFunction>,
 }
 
 fn new_parallel_descriptor(plugin: BoxedOrderedPlugin) -> PluginDescriptor {
@@ -63,27 +67,27 @@ fn new_parallel_descriptor(plugin: BoxedOrderedPlugin) -> PluginDescriptor {
 
 pub trait PluginDescriptorCoercion {
     /// Assigns a label to the system; there can be more than one, and it doesn't have to be unique.
-    fn label(self, label: impl SystemLabel) -> PluginDescriptor;
+    fn label<T: SystemLabel + Clone>(self, label: T) -> PluginDescriptor;
 
     /// Specifies that the system should run before systems with the given label.
-    fn before(self, label: impl SystemLabel) -> PluginDescriptor;
+    fn before<T: SystemLabel + Clone>(self, label: T) -> PluginDescriptor;
     /// Specifies that the system should run after systems with the given label.
-    fn after(self, label: impl SystemLabel) -> PluginDescriptor;
+    fn after<T: SystemLabel + Clone>(self, label: T) -> PluginDescriptor;
 }
 
 impl PluginDescriptorCoercion for PluginDescriptor {
-    fn label(mut self, label: impl SystemLabel) -> PluginDescriptor {
-        self.labels.push(Box::new(label));
+    fn label<T: SystemLabel + Clone>(mut self, label: T) -> PluginDescriptor {
+        self.labels.push(Box::new(FunctionBuilder { label }));
         self
     }
 
-    fn before(mut self, label: impl SystemLabel) -> PluginDescriptor {
-        self.before.push(Box::new(label));
+    fn before<T: SystemLabel + Clone>(mut self, label: T) -> PluginDescriptor {
+        self.before.push(Box::new(FunctionBuilder { label }));
         self
     }
 
-    fn after(mut self, label: impl SystemLabel) -> PluginDescriptor {
-        self.after.push(Box::new(label));
+    fn after<T: SystemLabel + Clone>(mut self, label: T) -> PluginDescriptor {
+        self.after.push(Box::new(FunctionBuilder { label }));
         self
     }
 }
@@ -92,29 +96,29 @@ impl<S> PluginDescriptorCoercion for S
 where
     S: OrderedPlugin,
 {
-    fn label(self, label: impl SystemLabel) -> PluginDescriptor {
+    fn label<T: SystemLabel + Clone>(self, label: T) -> PluginDescriptor {
         new_parallel_descriptor(Box::new(self)).label(label)
     }
 
-    fn before(self, label: impl SystemLabel) -> PluginDescriptor {
+    fn before<T: SystemLabel + Clone>(self, label: T) -> PluginDescriptor {
         new_parallel_descriptor(Box::new(self)).before(label)
     }
 
-    fn after(self, label: impl SystemLabel) -> PluginDescriptor {
+    fn after<T: SystemLabel + Clone>(self, label: T) -> PluginDescriptor {
         new_parallel_descriptor(Box::new(self)).after(label)
     }
 }
 
 impl PluginDescriptorCoercion for BoxedOrderedPlugin {
-    fn label(self, label: impl SystemLabel) -> PluginDescriptor {
+    fn label<T: SystemLabel + Clone>(self, label: T) -> PluginDescriptor {
         new_parallel_descriptor(self).label(label)
     }
 
-    fn before(self, label: impl SystemLabel) -> PluginDescriptor {
+    fn before<T: SystemLabel + Clone>(self, label: T) -> PluginDescriptor {
         new_parallel_descriptor(self).before(label)
     }
 
-    fn after(self, label: impl SystemLabel) -> PluginDescriptor {
+    fn after<T: SystemLabel + Clone>(self, label: T) -> PluginDescriptor {
         new_parallel_descriptor(self).after(label)
     }
 }

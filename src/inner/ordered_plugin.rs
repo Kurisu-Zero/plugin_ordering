@@ -1,4 +1,5 @@
 pub mod app_dummy;
+pub mod sized_label;
 use super::*;
 
 use std::any::Any;
@@ -27,8 +28,8 @@ impl<T: OrderedPlugin> PlainDescriptor for T {
     }
 }
 
-// unsafe impl Sync for OrderedPluginStruct {}
-// unsafe impl Send for OrderedPluginStruct {}
+unsafe impl Sync for PluginDescriptor {}
+unsafe impl Send for PluginDescriptor {}
 
 impl Plugin for PluginDescriptor {
     fn build(&self, app: &mut App) {
