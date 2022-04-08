@@ -17,6 +17,7 @@ pub trait PlainDescriptor {
 }
 impl<T: OrderedPlugin> PlainDescriptor for T {
     fn as_is(self) -> PluginDescriptor {
+        println!("run as_is");
         PluginDescriptor {
             ordered_plugin: Box::new(self),
             labels: Vec::new(),
@@ -31,7 +32,7 @@ impl<T: OrderedPlugin> PlainDescriptor for T {
 
 impl Plugin for PluginDescriptor {
     fn build(&self, app: &mut App) {
-        print!("Plugin is being build");
+        println!("Plugin is being build");
         let mut app_dummy = AppDummy::new(app, &self);
         app_dummy.build_impl();
     }
