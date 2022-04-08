@@ -11,12 +11,11 @@ pub mod release {
     mod plugin_descriptor;
 
     pub use ordered_plugin::{app_dummy::AppDummy, OrderedPlugin, PlainDescriptor};
-
-    use bevy::ecs::schedule::IntoSystemDescriptor;
-    use plugin_descriptor::PluginDescriptor;
+    pub use plugin_descriptor::PluginDescriptor;
 
     #[cfg(feature = "mocked")]
     pub use crate::mocks::*;
+    use bevy::ecs::schedule::IntoSystemDescriptor;
     #[cfg(not(feature = "mocked"))]
     pub use bevy::prelude::{App, Plugin};
 }
