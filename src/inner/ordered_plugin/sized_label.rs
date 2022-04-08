@@ -62,7 +62,7 @@ fn create_before_function<T: SystemLabel + Clone>(label: T) -> Box<ParaFunc> {
     Box::new(
         move |p: ParallelSystemDescriptor| -> ParallelSystemDescriptor {
             let x = label.clone();
-            p.after(x)
+            p.before(x)
         },
     )
 }
