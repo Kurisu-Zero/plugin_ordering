@@ -1,9 +1,6 @@
 #[cfg(feature = "mocked")]
 pub mod mocked {
-    pub use crate::common::*;
-
-    pub(crate) mod ordered_plugin;
-    pub(crate) mod plugin_descriptor;
+    pub use crate::inner::*;
 
     mod app;
     mod plugin;
@@ -13,23 +10,24 @@ pub mod mocked {
 
 #[cfg(not(feature = "mocked"))]
 pub mod release {
-    pub use crate::common::*;
-
-    pub(crate) mod ordered_plugin;
-    pub(crate) mod plugin_descriptor;
+    pub use crate::inner::*;
 
     pub use bevy::prelude::{App, Plugin};
 }
 
-mod common {
+mod inner {
+
     #[cfg(feature = "mocked")]
-    use crate::mocked as root;
+    use crate::mocked::*;
     #[cfg(not(feature = "mocked"))]
-    use crate::release as root;
+    use crate::release::*;
+
+    pub(crate) mod ordered_plugin;
+    pub(crate) mod plugin_descriptor;
 
     pub(crate) use bevy::ecs::schedule::IntoSystemDescriptor;
-    pub use root::ordered_plugin::{app_dummy::AppDummy, OrderedPlugin, PlainDescriptor};
-    pub use root::plugin_descriptor::{PluginDescriptor, PluginDescriptorCoercion};
+    pub use ordered_plugin::{app_dummy::AppDummy, OrderedPlugin, PlainDescriptor};
+    pub use plugin_descriptor::{PluginDescriptor, PluginDescriptorCoercion};
 }
 
 // unsafe impl Sync for TestPlugin {}
