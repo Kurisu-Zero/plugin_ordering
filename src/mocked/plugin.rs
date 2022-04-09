@@ -1,5 +1,7 @@
+use std::any::Any;
+
 use super::App;
-use mockall::*;
+use mockall::automock;
 
 #[automock]
 pub trait Plugin: Any + Send + Sync {
