@@ -1,25 +1,24 @@
 use bevy::{
     ecs::schedule::ParallelSystemDescriptor,
-    prelude::{ParallelSystemDescriptorCoercion, System, SystemLabel},
+    prelude::{ParallelSystemDescriptorCoercion, SystemLabel},
 };
-
-fn test_run<T: SystemLabel + Clone, U: SystemLabel + Clone>(
-    label1: T,
-    label2: U,
-    mut p: ParallelSystemDescriptor,
-) {
-    let f1 = FunctionBuilder { label: label1 };
-
-    let f2 = FunctionBuilder { label: label2 };
-
-    let v: Vec<Box<dyn LabelFunction>> = vec![Box::new(f1), Box::new(f2)];
-    for label_function in &v {
-        p = label_function.label()(p);
-    }
-}
 
 type ParaFunc = dyn Fn(ParallelSystemDescriptor) -> ParallelSystemDescriptor;
 
+/// # Examples
+///     use plugin_ordering::release::test::*;
+///     use bevy::prelude::ParallelSystemDescriptorCoercion;
+///     let sys = || ();
+///     let mut p = sys.after("");
+///     let label1 = "hi";
+///     let label2 = "some_label";
+///     let f1 = FunctionBuilder { label: label1 };
+///     let f2 = FunctionBuilder { label: label2 };
+///     let v: Vec<Box<dyn LabelFunction>> = vec![Box::new(f1), Box::new(f2)];
+///     for label_function in &v {
+///         p = label_function.label()(p);
+///     }
+///     
 pub trait LabelFunction {
     fn label(&self) -> Box<ParaFunc>;
     fn before(&self) -> Box<ParaFunc>;

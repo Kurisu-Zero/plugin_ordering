@@ -1,5 +1,6 @@
 pub mod app_dummy;
 pub mod sized_label;
+
 use super::*;
 
 use std::any::Any;
@@ -10,6 +11,54 @@ where
     fn build_impl(&self, app: &mut AppDummy);
     fn name(&self) -> &str {
         std::any::type_name::<Self>()
+    }
+}
+
+pub trait DynClone
+where
+    Self: Sized,
+{
+    fn dyn_clone(self) -> Box<dyn OrderedPlugin>;
+}
+
+impl<T: OrderedPlugin> DynClone for T {
+    fn dyn_clone(self) -> Box<dyn OrderedPlugin> {
+        Box::new(self)
+    }
+}
+
+struct EmptyOrderedPlugin;
+impl OrderedPlugin for EmptyOrderedPlugin {
+    fn build_impl(&self, _: &mut AppDummy) {}
+}
+
+impl Plugin for Box<dyn OrderedPlugin> {
+    fn build(&self, app: &mut App) {
+        (**self).build(app);
+    }
+}
+
+impl Plugin for dyn OrderedPlugin {
+    fn build(&self, app: &mut App) {
+        let pointer = self as *const dyn OrderedPlugin;
+        let pointer_mut = pointer as *mut dyn OrderedPlugin;
+        // #SAFETY: We have to make sure that the BOX will NOT be dropped!
+        // #SAFETY: And we CANNOT use self in any way directly until it is cleaned up
+        let mut desc = unsafe {
+            PluginDescriptor {
+                ordered_plugin: Box::from_raw(pointer_mut),
+                labels: Vec::new(),
+                before: Vec::new(),
+                after: Vec::new(),
+            }
+        };
+        println!("Plugin is being build from OrderedPlugin");
+        let mut app_dummy = AppDummy::new(app, &desc);
+        app_dummy.build_impl();
+        // #SAFETY: here we extract the dirty Box and prevent it from being dropped
+        let mut boxed_plugin: Box<dyn OrderedPlugin> = Box::new(EmptyOrderedPlugin);
+        std::mem::swap(&mut boxed_plugin, &mut desc.ordered_plugin);
+        Box::into_raw(boxed_plugin); // No more double free
     }
 }
 

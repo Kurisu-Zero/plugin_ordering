@@ -1,10 +1,6 @@
 use super::*;
 
-use bevy::{
-    ecs::schedule::{ParallelSystemDescriptor, SystemDescriptor},
-    prelude::{ParallelSystemDescriptorCoercion, SystemLabel},
-    reflect::TypeData,
-};
+use bevy::ecs::schedule::{ParallelSystemDescriptor, SystemDescriptor};
 pub struct AppDummy<'a> {
     app: &'a mut App,
     plugin_descriptor: &'a PluginDescriptor,
@@ -62,7 +58,7 @@ impl AppDummy<'_> {
             bevy::ecs::schedule::SystemDescriptor::Parallel(p) => {
                 Self::label_parallel_system(self, p)
             }
-            bevy::ecs::schedule::SystemDescriptor::Exclusive(e) => todo!(),
+            bevy::ecs::schedule::SystemDescriptor::Exclusive(_e) => todo!(),
         };
 
         println!(
@@ -74,7 +70,7 @@ impl AppDummy<'_> {
         self
     }
 
-    fn name<T>(v: &T) -> &'static str {
+    fn name<T>(_: &T) -> &'static str {
         std::any::type_name::<T>()
     }
 

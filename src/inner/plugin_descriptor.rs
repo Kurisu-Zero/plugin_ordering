@@ -5,7 +5,7 @@ use super::{
     *,
 };
 
-type BoxedSystemLabel = Box<dyn SystemLabel>;
+// type BoxedSystemLabel = Box<dyn SystemLabel>;
 type BoxedOrderedPlugin = Box<dyn OrderedPlugin>;
 type BoxedLabelFunction = Box<dyn LabelFunction>;
 
@@ -18,7 +18,7 @@ pub trait IntoPluginDescriptor<Params> {
     fn into_descriptor(self) -> PluginDescriptor;
 }
 
-pub struct PluginLabelMarker;
+// pub struct PluginLabelMarker;
 
 /////////////////////   PARALLEL    ///////////////////////
 
