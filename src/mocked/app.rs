@@ -1,5 +1,4 @@
 use super::Plugin;
-use bevy::ecs::schedule::IntoSystemDescriptor;
 use mockall::*;
 
 mock! {
