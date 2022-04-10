@@ -8,7 +8,7 @@ pub trait OrderedPlugin
 where
     Self: Any + Send + Sync,
 {
-    fn build_impl(&self, app: &mut AppDummy);
+    fn build(&self, app: &mut App);
     fn name(&self) -> &str {
         std::any::type_name::<Self>()
     }
@@ -29,17 +29,17 @@ impl<T: OrderedPlugin> DynClone for T {
 
 struct EmptyOrderedPlugin;
 impl OrderedPlugin for EmptyOrderedPlugin {
-    fn build_impl(&self, _: &mut AppDummy) {}
+    fn build(&self, _: &mut App) {}
 }
 
-impl Plugin for Box<dyn OrderedPlugin> {
-    fn build(&self, app: &mut App) {
-        (**self).build(app);
+impl Plugin_internal for Box<dyn OrderedPlugin> {
+    fn build(&self, app: &mut App_internal) {
+        <dyn OrderedPlugin as Plugin_internal>::build(&**self, app);
     }
 }
 
-impl Plugin for dyn OrderedPlugin {
-    fn build(&self, app: &mut App) {
+impl Plugin_internal for dyn OrderedPlugin {
+    fn build(&self, app: &mut App_internal) {
         let pointer = self as *const dyn OrderedPlugin;
         let pointer_mut = pointer as *mut dyn OrderedPlugin;
         // #SAFETY: We have to make sure that the BOX will NOT be dropped!
@@ -53,7 +53,7 @@ impl Plugin for dyn OrderedPlugin {
             }
         };
         println!("Plugin is being build from OrderedPlugin");
-        let mut app_dummy = AppDummy::new(app, &desc);
+        let mut app_dummy = App::new(app, &desc);
         app_dummy.build_impl();
         // #SAFETY: here we extract the dirty Box and prevent it from being dropped
         let mut boxed_plugin: Box<dyn OrderedPlugin> = Box::new(EmptyOrderedPlugin);
@@ -80,10 +80,10 @@ impl<T: OrderedPlugin> PlainDescriptor for T {
 unsafe impl Sync for PluginDescriptor {}
 unsafe impl Send for PluginDescriptor {}
 
-impl Plugin for PluginDescriptor {
-    fn build(&self, app: &mut App) {
+impl Plugin_internal for PluginDescriptor {
+    fn build(&self, app: &mut App_internal) {
         println!("Plugin is being build");
-        let mut app_dummy = AppDummy::new(app, &self);
+        let mut app_dummy = App::new(app, &self);
         app_dummy.build_impl();
     }
 

@@ -2,12 +2,12 @@ use super::*;
 
 use bevy::ecs::schedule::{ParallelSystemDescriptor, SystemDescriptor};
 pub struct AppDummy<'a> {
-    app: &'a mut App,
+    app: &'a mut App_internal,
     plugin_descriptor: &'a PluginDescriptor,
 }
 
 impl AppDummy<'_> {
-    pub fn new<'a>(app: &'a mut App, desc: &'a PluginDescriptor) -> AppDummy<'a> {
+    pub fn new<'a>(app: &'a mut App_internal, desc: &'a PluginDescriptor) -> AppDummy<'a> {
         AppDummy {
             app,
             plugin_descriptor: desc,
@@ -15,7 +15,7 @@ impl AppDummy<'_> {
     }
 
     pub fn build_impl(&mut self) {
-        self.plugin_descriptor.ordered_plugin.build_impl(self);
+        (*self.plugin_descriptor.ordered_plugin).build(self);
     }
 
     pub fn add_plugin<T>(&mut self, mut plugin: PluginDescriptor) -> &mut Self {
